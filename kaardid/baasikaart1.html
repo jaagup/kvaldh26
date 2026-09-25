@@ -21,8 +21,10 @@
     }).addTo(kaart);
 	  fetch("https://script.google.com/macros/s/AKfycbyInIkvv8ZoUYT-UJuoKklAnM_rPOxwvwf212SavBtUv0EvQTfhhp5ianb_yNp7FX_c/exec"
 		    ).then(d => d.json()).then(kuva);
+	   console.log("tellitud");
   }
   function kuva(kohad){
+	console.log(kohad);
 	for(let koht of kohad){
 	  L.marker([koht[0], koht[1]]).addTo(kaart);
 	}
