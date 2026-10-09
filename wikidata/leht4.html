@@ -19,6 +19,7 @@
 
               LIMIT 10
            `;
+           console.log(lause);
            let aadress="https://query.wikidata.org/sparql?format=json&query="+encodeURI(lause);  
            vastus.innerHTML="ootan vastust";
            fetch(aadress).then(d => d.json()).then(kuva);
