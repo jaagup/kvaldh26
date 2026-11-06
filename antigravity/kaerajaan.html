@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaerajaan – 1. ja 2. osa</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            margin: 0;
+            padding: 20px 14px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: #ffffff;
+            max-width: 640px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 24px 24px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-top: 0;
+            margin-bottom: 4px;
+            color: #111827;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 14px;
+        }
+
+        /* Tantsu 1. osa kirjeldus ja sammude jälgija */
+        .dance-tracker {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+
+        .tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tracker-title {
+            font-weight: 700;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-live-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            background-color: #e2e8f0;
+            color: #475569;
+            transition: all 0.2s ease;
+        }
+
+        .step-live-badge.active-step {
+            background-color: #dcfce7;
+            color: #15803d;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+        }
+
+        /* 5 sammu visualiseerija ribad */
+        .steps-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .step-chip {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .step-chip .step-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            line-height: 1;
+        }
+
+        .step-chip .step-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        .step-chip .step-note {
+            font-size: 0.65rem;
+            color: #64748b;
+        }
+
+        .step-chip.highlight {
+            background-color: #059669;
+            border-color: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);
+        }
+
+        .step-chip.highlight .step-num,
+        .step-chip.highlight .step-name,
+        .step-chip.highlight .step-note {
+            color: #ffffff;
+        }
+
+        /* Tantsuplats / ring */
+        .stage-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            aspect-ratio: 1 / 1;
+            margin: 8px auto 14px auto;
+        }
+
+        /* SVG taustajooned ja sihid */
+        .stage-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Tantsija kaart */
+        .dancer-card {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 2px solid;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+            user-select: none;
+            min-width: 90px;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        /* Naiste stiil (punakas/roosakas) */
+        .dancer-woman {
+            border-color: #fda4af;
+            background: linear-gradient(180deg, #ffffff 60%, #fff1f2 100%);
+        }
+
+        .dancer-woman .role-badge {
+            color: #be123c;
+            background-color: #ffe4e6;
+        }
+
+        /* Meeste stiil (sinakas) */
+        .dancer-man {
+            border-color: #93c5fd;
+            background: linear-gradient(180deg, #ffffff 60%, #eff6ff 100%);
+        }
+
+        .dancer-man .role-badge {
+            color: #1d4ed8;
+            background-color: #dbeafe;
+        }
+
+        .avatar {
+            font-size: 1.5rem;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1f2937;
+            white-space: nowrap;
+        }
+
+        .role-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        /* Jalaindikaatorid tantsijal */
+        .feet-box {
+            display: flex;
+            gap: 6px;
+            margin-top: 5px;
+        }
+
+        .foot-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            transition: all 0.15s ease;
+        }
+
+        .foot-tag.active {
+            background-color: #059669;
+            color: #ffffff;
+            border-color: #047857;
+            transform: scale(1.15);
+            box-shadow: 0 0 6px rgba(5, 150, 105, 0.6);
+        }
+
+        .gaze-hint {
+            font-size: 0.68rem;
+            color: #64748b;
+            margin-top: 3px;
+            white-space: nowrap;
+        }
+
+        /* Hüppeliigutused keskpunkti ("ette") suunas */
+        .pos-top.hop-forward {
+            transform: translate(-50%, calc(-50% + 15px)) scale(1.08) !important;
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.25);
+        }
+
+        .pos-bottom.hop-forward {
+            transform: translate(-50%, calc(-50% - 15px)) scale(1.08) !important;
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.25);
+        }
+
+        .pos-right.hop-forward {
+            transform: translate(calc(-50% - 15px), -50%) scale(1.08) !important;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .pos-left.hop-forward {
+            transform: translate(calc(-50% + 15px), -50%) scale(1.08) !important;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        /* 2. osa: kohtade vahetuse animatsioonid kaarega (paremate õlgadega möödumine, 2 korda aeglasem: 2.4s) */
+        @keyframes swap-top-to-bottom {
+            0% { left: 50%; top: 15%; }
+            50% { left: 40%; top: 50%; }
+            100% { left: 50%; top: 85%; }
+        }
+
+        @keyframes swap-bottom-to-top {
+            0% { left: 50%; top: 85%; }
+            50% { left: 60%; top: 50%; }
+            100% { left: 50%; top: 15%; }
+        }
+
+        @keyframes swap-right-to-left {
+            0% { left: 85%; top: 50%; }
+            50% { left: 50%; top: 40%; }
+            100% { left: 15%; top: 50%; }
+        }
+
+        @keyframes swap-left-to-right {
+            0% { left: 15%; top: 50%; }
+            50% { left: 50%; top: 60%; }
+            100% { left: 85%; top: 50%; }
+        }
+
+        .anim-swap-top-to-bottom {
+            animation: swap-top-to-bottom 2.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+            z-index: 10 !important;
+        }
+
+        .anim-swap-bottom-to-top {
+            animation: swap-bottom-to-top 2.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+            z-index: 10 !important;
+        }
+
+        .anim-swap-right-to-left {
+            animation: swap-right-to-left 2.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+            z-index: 10 !important;
+        }
+
+        .anim-swap-left-to-right {
+            animation: swap-left-to-right 2.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+            z-index: 10 !important;
+        }
+
+        /* Juhtpaneelid */
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #ffffff;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-full-dance {
+            background: linear-gradient(135deg, #059669 0%, #2563eb 50%, #7c3aed 100%);
+            font-size: 0.95rem;
+            padding: 11px 22px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+            width: 100%;
+            justify-content: center;
+        }
+        .btn-full-dance:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+        }
+
+        .btn-play {
+            background-color: #059669;
+        }
+        .btn-play:hover {
+            background-color: #047857;
+        }
+
+        .btn-part2 {
+            background-color: #7c3aed;
+        }
+        .btn-part2:hover {
+            background-color: #6d28d9;
+        }
+
+        .btn-step {
+            background-color: #0284c7;
+        }
+        .btn-step:hover {
+            background-color: #0369a1;
+        }
+
+        .btn-random {
+            background-color: #e11d48;
+        }
+        .btn-random:hover {
+            background-color: #be123c;
+        }
+
+        .btn-rotate {
+            background-color: #4b5563;
+        }
+        .btn-rotate:hover {
+            background-color: #374151;
+        }
+
+        @media (max-width: 520px) {
+            .steps-list {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 4px;
+            }
+            .step-chip .step-name {
+                font-size: 0.65rem;
+            }
+            .step-chip .step-note {
+                display: none;
+            }
+            .dancer-card {
+                padding: 6px 8px;
+                min-width: 74px;
+            }
+            .name {
+                font-size: 0.8rem;
+            }
+            .avatar {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kaerajaan – tantsu 1. ja 2. osa</h1>
+    <div class="subtitle">1. osa: hüpped ette &nbsp;•&nbsp; 2. osa: kohtade vahetus</div>
+
+    <!-- Tantsu 1. osa sammude jälgija -->
+    <div class="dance-tracker">
+        <div class="tracker-header">
+            <span class="tracker-title">🎵 1. osa: hüpped ette (Kaerajaani põhisamm)</span>
+            <span id="hetkeSammTekst" class="step-live-badge">Vajuta „Alusta tantsu“</span>
+        </div>
+        <div class="steps-list">
+            <div class="step-chip" id="step-1">
+                <span class="step-num">1. samm</span>
+                <span class="step-name">Vasak ette</span>
+                <span class="step-note">aeglane</span>
+            </div>
+            <div class="step-chip" id="step-2">
+                <span class="step-num">2. samm</span>
+                <span class="step-name">Parem ette</span>
+                <span class="step-note">aeglane</span>
+            </div>
+            <div class="step-chip" id="step-3">
+                <span class="step-num">3. samm</span>
+                <span class="step-name">Vasak ette</span>
+                <span class="step-note">kiire</span>
+            </div>
+            <div class="step-chip" id="step-4">
+                <span class="step-num">4. samm</span>
+                <span class="step-name">Parem ette</span>
+                <span class="step-note">kiire</span>
+            </div>
+            <div class="step-chip" id="step-5">
+                <span class="step-num">5. samm</span>
+                <span class="step-name">Vasak ette</span>
+                <span class="step-note">kiire</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tantsuplats / ring -->
+    <div class="stage-wrapper" id="plats">
+        <!-- SVG jooned: ringjoon ja pilgusuunad -->
+        <svg class="stage-svg" viewBox="0 0 100 100">
+            <!-- Tantsuringi piirjoon -->
+            <circle cx="50" cy="50" r="35" fill="none" stroke="#e2e8f0" stroke-width="1.8" stroke-dasharray="2,2" />
+
+            <!-- Naiste pilgjoon (vertikaalne, naised vaatavad teineteisele otsa) -->
+            <line x1="50" y1="23" x2="50" y2="77" stroke="#fda4af" stroke-width="1.2" stroke-dasharray="2,2" />
+            <polygon points="50,44 48,41 52,41" fill="#e11d48" />
+            <polygon points="50,56 48,59 52,59" fill="#e11d48" />
+
+            <!-- Meeste pilgjoon (horisontaalne, mehed vaatavad teineteisele otsa) -->
+            <line x1="23" y1="50" x2="77" y2="50" stroke="#93c5fd" stroke-width="1.2" stroke-dasharray="2,2" />
+            <polygon points="44,50 41,48 41,52" fill="#2563eb" />
+            <polygon points="56,50 59,48 59,52" fill="#2563eb" />
+
+            <!-- Keskpunkt -->
+            <circle cx="50" cy="50" r="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+            <text x="50" y="51.2" font-size="2.6" text-anchor="middle" fill="#94a3b8" font-family="sans-serif">✕</text>
+        </svg>
+
+        <!-- Naine 1 (Üleval / Põhi, vaade ALLA keskme poole) -->
+        <div class="dancer-card dancer-woman pos-top" id="dancer-top" style="left: 50%; top: 15%;">
+            <div class="avatar">👩</div>
+            <div class="name" id="naine1Nimi">Naine 1</div>
+            <div class="role-badge">1. naine</div>
+            <div class="feet-box">
+                <span class="foot-tag foot-vasak">V</span>
+                <span class="foot-tag foot-parem">P</span>
+            </div>
+            <div class="gaze-hint">Vaade alla ⬇️</div>
+        </div>
+
+        <!-- Mees 1 (Paremal / Ida, vaade VASAKULE keskme poole) -->
+        <div class="dancer-card dancer-man pos-right" id="dancer-right" style="left: 85%; top: 50%;">
+            <div class="avatar">👨</div>
+            <div class="name" id="mees1Nimi">Mees 1</div>
+            <div class="role-badge">1. mees</div>
+            <div class="feet-box">
+                <span class="foot-tag foot-vasak">V</span>
+                <span class="foot-tag foot-parem">P</span>
+            </div>
+            <div class="gaze-hint">⬅️ Vaade vasakule</div>
+        </div>
+
+        <!-- Naine 2 (All / Lõuna, vaade ÜLES keskme poole) -->
+        <div class="dancer-card dancer-woman pos-bottom" id="dancer-bottom" style="left: 50%; top: 85%;">
+            <div class="gaze-hint">Vaade üles ⬆️</div>
+            <div class="feet-box">
+                <span class="foot-tag foot-vasak">V</span>
+                <span class="foot-tag foot-parem">P</span>
+            </div>
+            <div class="avatar">👩</div>
+            <div class="name" id="naine2Nimi">Naine 2</div>
+            <div class="role-badge">2. naine</div>
+        </div>
+
+        <!-- Mees 2 (Vasakul / Lääs, vaade PAREMALE keskme poole) -->
+        <div class="dancer-card dancer-man pos-left" id="dancer-left" style="left: 15%; top: 50%;">
+            <div class="avatar">👨</div>
+            <div class="name" id="mees2Nimi">Mees 2</div>
+            <div class="role-badge">2. mees</div>
+            <div class="feet-box">
+                <span class="foot-tag foot-vasak">V</span>
+                <span class="foot-tag foot-parem">P</span>
+            </div>
+            <div class="gaze-hint">Vaade paremale ➡️</div>
+        </div>
+    </div>
+
+    <!-- Juhtpaneel -->
+    <div class="controls-section">
+        <div class="btn-row">
+            <button id="btnKoguTants" class="btn-full-dance" onclick="tantsiKoguTants()">✨ Tantsi järjest 1. ja 2. osa</button>
+        </div>
+        <div class="btn-row">
+            <button id="btnPlay" class="btn-play" onclick="toggleTants()">▶️ 1. osa (hüpped)</button>
+            <button id="btnOsa2" class="btn-part2" onclick="tantsiTeineOsa()">🔄 2. osa (kohavahetus)</button>
+            <button class="btn-step" onclick="jargmineHupe()">⏭️ Järgmine hüpe</button>
+        </div>
+        <div class="btn-row">
+            <button class="btn-random" onclick="valiUuedTantsijad()">🎲 Vali uued tantsijad</button>
+            <button class="btn-rotate" onclick="vahetaKohti()">↻ Vaheta kohti (90°)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tabeli aadressid veebis
+    const URL_NAISED = "https://docs.google.com/spreadsheets/d/1mcxAnhCth-nvfKkStKqtWvhXq5ZJEf1HjHBpCRfbxlk/export?format=csv&gid=703591842";
+    const URL_MEHED = "https://docs.google.com/spreadsheets/d/1mcxAnhCth-nvfKkStKqtWvhXq5ZJEf1HjHBpCRfbxlk/export?format=csv&gid=678603545";
+
+    // Vaikimisi tagavaranimed
+    const VAIKE_NAISED = ["Anna", "Maria", "Laura", "Sandra", "Kadri", "Katrin", "Tiina", "Triin", "Kristiina", "Liis", "Tiiu"];
+    const VAIKE_MEHED = ["Aleksander", "Andres", "Jaan", "Jüri", "Madis", "Marko", "Martin", "Peeter", "Rasmus", "Sander", "Toomas"];
+
+    let koikNaised = [...VAIKE_NAISED];
+    let koikMehed = [...VAIKE_MEHED];
+
+    let valitudNaised = [];
+    let valitudMehed = [];
+
+    // Tantsu 1. osa sammud:
+    // 1. Vasak jalg ette
+    // 2. Parem jalg ette
+    // 3. Vasak jalg ette
+    // 4. Parem jalg ette
+    // 5. Vasak jalg ette
+    const SAMMUD = [
+        { nr: 1, jalg: "vasak", tekst: "1. samm: Vasak jalg ette!", viis: "„Kae-ra-jaan...“", aeglane: true, kestus: 850 },
+        { nr: 2, jalg: "parem", tekst: "2. samm: Parem jalg ette!", viis: "„...oi Kae-ra-jaan...“", aeglane: true, kestus: 850 },
+        { nr: 3, jalg: "vasak", tekst: "3. samm: Vasak ette!", viis: "„kar-“", aeglane: false, kestus: 420 },
+        { nr: 4, jalg: "parem", tekst: "4. samm: Parem ette!", viis: "„-ga väl-“", aeglane: false, kestus: 420 },
+        { nr: 5, jalg: "vasak", tekst: "5. samm: Vasak ette!", viis: "„-ja aiast!“", aeglane: false, kestus: 650 },
+        { nr: 0, jalg: "puhkus", tekst: "Puhkehetk enne kordust", viis: "", aeglane: false, kestus: 800 }
+    ];
+
+    let sammuIndeks = -1;
+    let tantsKaib = false;
+    let tantsuTaimer = null;
+
+    // Sooritab ühe tantsusammu / hüppe ette
+    function sooritaSamm(indeks) {
+        sammuIndeks = indeks;
+        const sammData = SAMMUD[sammuIndeks];
+        const statusEl = document.getElementById("hetkeSammTekst");
+
+        // Eemaldame eelmised aktiivsuse märgid
+        document.querySelectorAll(".step-chip").forEach(el => el.classList.remove("highlight"));
+        document.querySelectorAll(".dancer-card").forEach(el => el.classList.remove("hop-forward"));
+        document.querySelectorAll(".foot-tag").forEach(el => el.classList.remove("active"));
+
+        if (sammData.nr > 0) {
+            // Tõstame esile aktiivse sammu kaardi
+            const chip = document.getElementById(`step-${sammData.nr}`);
+            if (chip) chip.classList.add("highlight");
+
+            statusEl.textContent = `${sammData.tekst} ${sammData.viis ? sammData.viis : ""}`;
+            statusEl.className = "step-live-badge active-step";
+
+            // Paneme tantsijad keskme suunas ette hüppama
+            document.querySelectorAll(".dancer-card").forEach(el => el.classList.add("hop-forward"));
+
+            // Süütame vastava jala tähise (V või P)
+            if (sammData.jalg === "vasak") {
+                document.querySelectorAll(".foot-vasak").forEach(el => el.classList.add("active"));
+            } else if (sammData.jalg === "parem") {
+                document.querySelectorAll(".foot-parem").forEach(el => el.classList.add("active"));
+            }
+
+            // Hüppeliigutus kestab lühidalt, seejärel maanduvad tantsijad tagasi
+            setTimeout(() => {
+                document.querySelectorAll(".dancer-card").forEach(el => el.classList.remove("hop-forward"));
+            }, Math.min(260, sammData.kestus - 80));
+
+        } else {
+            // Puhkehetk fraaside vahel
+            statusEl.textContent = "Puhkehetk enne uut ringi...";
+            statusEl.className = "step-live-badge";
+        }
+    }
+
+    // Liigub järgmisele hüppele
+    function jargmineHupe() {
+        const jargmineIndeks = (sammuIndeks + 1) % SAMMUD.length;
+        sooritaSamm(jargmineIndeks);
+    }
+
+    // Tantsu automaatne tsükkel
+    function tantsuTsukkel() {
+        if (!tantsKaib) return;
+
+        jargmineHupe();
+        const praeguneKestus = SAMMUD[sammuIndeks].kestus;
+
+        tantsuTaimer = setTimeout(() => {
+            tantsuTsukkel();
+        }, praeguneKestus);
+    }
+
+    // Lubadusepõhine ootepaus asünkroonseks liikumiseks
+    const oota = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Alustab või peatab tantsu automaatse esituse
+    function toggleTants() {
+        tantsKaib = !tantsKaib;
+        const btn = document.getElementById("btnPlay");
+
+        if (tantsKaib) {
+            btn.textContent = "⏸️ Peata tants";
+            btn.style.backgroundColor = "#d97706";
+            tantsuTsukkel();
+        } else {
+            btn.textContent = "▶️ 1. osa (hüpped)";
+            btn.style.backgroundColor = "#059669";
+            clearTimeout(tantsuTaimer);
+            tantsuTaimer = null;
+            document.querySelectorAll(".dancer-card").forEach(el => el.classList.remove("hop-forward"));
+            document.querySelectorAll(".foot-tag").forEach(el => el.classList.remove("active"));
+            document.getElementById("hetkeSammTekst").textContent = "Peatatud";
+            document.getElementById("hetkeSammTekst").className = "step-live-badge";
+        }
+    }
+
+    // 1. osa (hüpped ette) esitamine ühe täieliku tsüklina
+    async function sooritaEsimeneOsaTsukkel() {
+        for (let i = 0; i < 5; i++) {
+            sooritaSamm(i);
+            await oota(SAMMUD[i].kestus);
+        }
+        sooritaSamm(5); // väike puhkehetk enne järgmist osa
+        await oota(600);
+    }
+
+    // 2. osa (kohtade vahetus): 2 korda aeglasem kiirus (2.4s liikumine)
+    let osa2Kaib = false;
+
+    async function sooritaTeineOsa() {
+        const statusEl = document.getElementById("hetkeSammTekst");
+        statusEl.className = "step-live-badge active-step";
+        statusEl.textContent = "2. osa (1/2): Naised vahetavad kohad (aeglane liikumine)...";
+
+        // 1. samm: Naised vahetavad omavahel kohad (2.4s)
+        const womanTop = document.querySelector('.dancer-woman.pos-top');
+        const womanBottom = document.querySelector('.dancer-woman.pos-bottom');
+
+        if (womanTop && womanBottom) {
+            womanTop.classList.add('anim-swap-top-to-bottom');
+            womanBottom.classList.add('anim-swap-bottom-to-top');
+
+            await oota(2400);
+
+            womanTop.classList.remove('anim-swap-top-to-bottom', 'pos-top');
+            womanBottom.classList.remove('anim-swap-bottom-to-top', 'pos-bottom');
+
+            womanTop.classList.add('pos-bottom');
+            womanTop.style.left = '50%';
+            womanTop.style.top = '85%';
+            const hintTop = womanTop.querySelector('.gaze-hint');
+            if (hintTop) hintTop.textContent = 'Vaade üles ⬆️';
+
+            womanBottom.classList.add('pos-top');
+            womanBottom.style.left = '50%';
+            womanBottom.style.top = '15%';
+            const hintBottom = womanBottom.querySelector('.gaze-hint');
+            if (hintBottom) hintBottom.textContent = 'Vaade alla ⬇️';
+        }
+
+        await oota(500); // väike paus enne meeste alustamist
+
+        // 2. samm: Mehed vahetavad omavahel kohad (2.4s)
+        statusEl.textContent = "2. osa (2/2): Mehed vahetavad kohad (aeglane liikumine)...";
+
+        const manRight = document.querySelector('.dancer-man.pos-right');
+        const manLeft = document.querySelector('.dancer-man.pos-left');
+
+        if (manRight && manLeft) {
+            manRight.classList.add('anim-swap-right-to-left');
+            manLeft.classList.add('anim-swap-left-to-right');
+
+            await oota(2400);
+
+            manRight.classList.remove('anim-swap-right-to-left', 'pos-right');
+            manLeft.classList.remove('anim-swap-left-to-right', 'pos-left');
+
+            manRight.classList.add('pos-left');
+            manRight.style.left = '15%';
+            manRight.style.top = '50%';
+            const hintRight = manRight.querySelector('.gaze-hint');
+            if (hintRight) hintRight.textContent = 'Vaade paremale ➡️';
+
+            manLeft.classList.add('pos-right');
+            manLeft.style.left = '85%';
+            manLeft.style.top = '50%';
+            const hintLeft = manLeft.querySelector('.gaze-hint');
+            if (hintLeft) hintLeft.textContent = '⬅️ Vaade vasakule';
+        }
+
+        await oota(400);
+        statusEl.textContent = "2. osa tehtud: kohad on vahetatud!";
+        statusEl.className = "step-live-badge";
+    }
+
+    // Iseseisev 2. osa nupu funktsioon
+    async function tantsiTeineOsa() {
+        if (osa2Kaib || tantsudJarjestKaib) return;
+        osa2Kaib = true;
+
+        if (tantsKaib) toggleTants();
+
+        const btnOsa2 = document.getElementById("btnOsa2");
+        if (btnOsa2) { btnOsa2.disabled = true; btnOsa2.style.opacity = "0.7"; }
+
+        await sooritaTeineOsa();
+
+        if (btnOsa2) { btnOsa2.disabled = false; btnOsa2.style.opacity = "1"; }
+        osa2Kaib = false;
+    }
+
+    // UUS: Tantsib järjest 1. osa (hüpped ette) ja 2. osa (2x aeglasem kohavahetus)
+    let tantsudJarjestKaib = false;
+
+    async function tantsiKoguTants() {
+        if (tantsudJarjestKaib || osa2Kaib) return;
+        tantsudJarjestKaib = true;
+
+        if (tantsKaib) toggleTants();
+
+        const btnKogu = document.getElementById("btnKoguTants");
+        const btnPlay = document.getElementById("btnPlay");
+        const btnOsa2 = document.getElementById("btnOsa2");
+
+        if (btnKogu) { btnKogu.disabled = true; btnKogu.style.opacity = "0.7"; }
+        if (btnPlay) { btnPlay.disabled = true; }
+        if (btnOsa2) { btnOsa2.disabled = true; }
+
+        const statusEl = document.getElementById("hetkeSammTekst");
+        statusEl.className = "step-live-badge active-step";
+        statusEl.textContent = "Terve tants: 1. osa (hüpped ette)...";
+
+        // 1. Tantsitakse esimene osa
+        await sooritaEsimeneOsaTsukkel();
+
+        // Üleminekuhetk
+        statusEl.textContent = "1. osa lõppes! Algab 2. osa (aeglane kohavahetus)...";
+        await oota(800);
+
+        // 2. Tantsitakse teine osa (2x aeglasem)
+        await sooritaTeineOsa();
+
+        statusEl.textContent = "🎉 Terve tants (1. ja 2. osa) edukalt sooritatud!";
+        statusEl.className = "step-live-badge";
+
+        if (btnKogu) { btnKogu.disabled = false; btnKogu.style.opacity = "1"; }
+        if (btnPlay) { btnPlay.disabled = false; }
+        if (btnOsa2) { btnOsa2.disabled = false; }
+
+        tantsudJarjestKaib = false;
+    }
+
+    // Juhuslike tantsijate valik
+    function votaJuhuslikud(massiiv, kogus) {
+        const segatud = [...massiiv].sort(() => 0.5 - Math.random());
+        return segatud.slice(0, kogus);
+    }
+
+    function valiUuedTantsijad() {
+        valitudNaised = votaJuhuslikud(koikNaised, 2);
+        valitudMehed = votaJuhuslikud(koikMehed, 2);
+
+        document.getElementById("naine1Nimi").textContent = valitudNaised[0];
+        document.getElementById("naine2Nimi").textContent = valitudNaised[1];
+        document.getElementById("mees1Nimi").textContent = valitudMehed[0];
+        document.getElementById("mees2Nimi").textContent = valitudMehed[1];
+    }
+
+    // Pööra kohti ringil (90 kraadi)
+    function vahetaKohti() {
+        const ajutineN = valitudNaised[0];
+        valitudNaised[0] = valitudNaised[1];
+        valitudNaised[1] = ajutineN;
+
+        const ajutineM = valitudMehed[0];
+        valitudMehed[0] = valitudMehed[1];
+        valitudMehed[1] = ajutineM;
+
+        document.getElementById("naine1Nimi").textContent = valitudNaised[0];
+        document.getElementById("naine2Nimi").textContent = valitudNaised[1];
+        document.getElementById("mees1Nimi").textContent = valitudMehed[0];
+        document.getElementById("mees2Nimi").textContent = valitudMehed[1];
+    }
+
+    // Andmete laadimine veebitabelitest
+    async function laeNimekirjad() {
+        try {
+            const [vastusN, vastusM] = await Promise.all([
+                fetch(URL_NAISED + "&t=" + Date.now()),
+                fetch(URL_MEHED + "&t=" + Date.now())
+            ]);
+
+            if (vastusN.ok) {
+                const tekstN = await vastusN.text();
+                const loetudNaised = tekstN.split(/\r?\n/).map(r => r.trim()).filter(r => r.length > 0);
+                if (loetudNaised.length >= 2) koikNaised = loetudNaised;
+            }
+
+            if (vastusM.ok) {
+                const tekstM = await vastusM.text();
+                const loetudMehed = tekstM.split(/\r?\n/).map(r => r.trim()).filter(r => r.length > 0);
+                if (loetudMehed.length >= 2) koikMehed = loetudMehed;
+            }
+        } catch (e) {
+            console.log("Kasutatakse kohalikke nimesid:", e.message);
+        }
+
+        valiUuedTantsijad();
+    }
+
+    // Lehe käivitamine
+    laeNimekirjad();
+</script>
+
+</body>
+</html>
