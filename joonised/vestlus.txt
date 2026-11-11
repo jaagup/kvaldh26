@@ -1,0 +1,210 @@
+KASUTAJA:
+Tutvu failiga joonis1.html. Koosta sarnase struktuuriga fail joonis3.html, kus joonistatakse kolme ringi abil lumememm.
+
+ASSISTENT:
+Koostasin faili joonis3.html, mis järgib faili joonis1.html ülesehitust ning joonistab lõuendile kolme ringi (arc) abil lumememme:
+
+<!doctype html>
+<html>
+  <head>
+    <title>Lumememm</title>
+	<script>
+	  function joonista(){
+	    let g=tahvel.getContext("2d");
+		
+		// Alumine ring
+		g.beginPath();
+		g.arc(200, 220, 50, 0, 2 * Math.PI);
+		g.stroke();
+
+		// Keskmine ring
+		g.beginPath();
+		g.arc(200, 145, 35, 0, 2 * Math.PI);
+		g.stroke();
+
+		// Ülemine ring (pea)
+		g.beginPath();
+		g.arc(200, 85, 25, 0, 2 * Math.PI);
+		g.stroke();
+	  }
+	</script>
+  </head>
+  <body onload="joonista()">
+    <h1>Lumememm</h1>
+	<canvas id="tahvel" width="400" height="300">
+	</canvas>
+  </body>
+</html>
+
+==================================================
+
+KASUTAJA:
+Loo joonis4.html. Sinna koosta funktsioon lumememme joonistamiseks. Parameetritena antakse ette x ning y-koordinaat ning alumise ringi läbimõõt.  Lisa lehele demo kahe lumememme joonistamiseks funktsiooni abil.
+
+ASSISTENT:
+Koostasin faili joonis4.html.
+
+Failis on:
+- Funktsioon lumememm(x, y, d), mille parameetriteks on alumise ringi keskpunkti koordinaadid (x, y) ning alumise ringi läbimõõt (d). Sellest lähtuvalt arvutatakse proportsionaalselt keskmise ringi ja pea mõõtmed ning asukohad.
+- Funktsioonis joonista() on demo, mis kutsub funktsiooni välja kahe erineva asukoha ja suurusega lumememme joonistamiseks: lumememm(120, 220, 80) ja lumememm(280, 230, 60).
+
+<!doctype html>
+<html>
+  <head>
+    <title>Lumememmed funktsiooniga</title>
+	<script>
+	  let g;
+
+	  // Funktsioon lumememme joonistamiseks
+	  // x, y - alumise ringi keskpunkti koordinaadid
+	  // d - alumise ringi läbimõõt (diameeter)
+	  function lumememm(x, y, d){
+	    let r1 = d / 2;       // alumise ringi raadius
+	    let r2 = r1 * 0.7;    // keskmise ringi raadius
+	    let r3 = r1 * 0.5;    // ülemise ringi (pea) raadius
+
+	    // Alumine ring
+	    g.beginPath();
+	    g.arc(x, y, r1, 0, 2 * Math.PI);
+	    g.stroke();
+
+	    // Keskmine ring
+	    let y2 = y - r1 - r2;
+	    g.beginPath();
+	    g.arc(x, y2, r2, 0, 2 * Math.PI);
+	    g.stroke();
+
+	    // Ülemine ring (pea)
+	    let y3 = y2 - r2 - r3;
+	    g.beginPath();
+	    g.arc(x, y3, r3, 0, 2 * Math.PI);
+	    g.stroke();
+	  }
+
+	  function joonista(){
+	    g = tahvel.getContext("2d");
+		
+	    // Demo: kahe erineva suuruse ja asukohaga lumememme joonistamine
+	    lumememm(120, 220, 80);
+	    lumememm(280, 230, 60);
+	  }
+	</script>
+  </head>
+  <body onload="joonista()">
+    <h1>Kaks lumememme</h1>
+	<canvas id="tahvel" width="400" height="300">
+	</canvas>
+  </body>
+</html>
+
+==================================================
+
+KASUTAJA:
+Otsi Internetist järgneva nelja päeva keskpäevased õhutemperatuurid ja tuule tugevused Tallinnas. Salvesta faili ilmaandmed.txt
+
+ASSISTENT:
+Otsisin prognoosiandmed Keskkonnaagentuuri (Ilmateenistuse) prognooside põhjal ja salvestasin need faili ilmaandmed.txt.
+
+Tallinna ilmaprognoos keskpäeval (kell 12:00)
+
+Kuupäev       Nädalapäev    Temperatuur (°C)    Tuule kiirus (m/s)    Tuule puhangud (m/s)
+12.11.2026    Neljapäev     +5                  6                     kuni 18
+13.11.2026    Reede         +4                  7                     kuni 18
+14.11.2026    Laupäev       +3                  8                     kuni 22
+15.11.2026    Pühapäev      +5                  8                     kuni 21
+
+==================================================
+
+KASUTAJA:
+Loo fail joonis5.html. Koosta sinna funktsioon lumememme joonistamiseks. Antakse ette x ja y koordinaat. Temperatuur, tuule kiirus, tuulepuhangu kiirus ning kuupäev. Andmete põhjal joonistatakse lumememm, kus suurem temperatuur tähistab suuremat alumist palli, suurem tuule kiirus keskmist palli ja suurem puhangukiirus suuremat ülemist palli. Kuupäev joonistatakse alumise palli keskele. 
+
+Kopeeri ilmaandmed.txt failist vajalik massiivina uue html-faili sisse ning selle massiivi põhjal ja funktsiooni abil joonista ilma illustreerivad lumememmed.
+
+ASSISTENT:
+Koostasin faili joonis5.html.
+
+Lahenduse detailid:
+- Andmemassiiv: Failist ilmaandmed.txt kopeeritud 4 päeva prognoos on esitatud objektide massiivina ilmaandmed.
+- Funktsioon lumememm(x, y, temp, tuul, puhang, kuupaev):
+  - Alumine pall: raadius sõltub temperatuurist (temp * 8).
+  - Keskmine pall: raadius sõltub tuule kiirusest (tuul * 4).
+  - Ülemine pall: raadius sõltub puhangukiirusest (puhang * 1).
+  - Kuupäev: joonistatakse fillText abil alumise palli keskele (textAlign = "center" ja textBaseline = "middle").
+- Joonistamine: Funktsioon joonista() käib tsükliga läbi massiivi ja paigutab nelja päeva lumememmed kõrvuti lõuendile.
+
+<!doctype html>
+<html>
+  <head>
+    <title>Ilma illustreerivad lumememmed</title>
+	<script>
+	  let g;
+
+	  // Ilmaandmed failist ilmaandmed.txt
+	  let ilmaandmed = [
+	    { kuupaev: "12.11", temp: 5, tuul: 6, puhang: 18 },
+	    { kuupaev: "13.11", temp: 4, tuul: 7, puhang: 18 },
+	    { kuupaev: "14.11", temp: 3, tuul: 8, puhang: 22 },
+	    { kuupaev: "15.11", temp: 5, tuul: 8, puhang: 21 }
+	  ];
+
+	  // Funktsioon lumememme joonistamiseks ilmaandmete põhjal
+	  // x, y - alumise palli keskpunkti koordinaadid
+	  // temp - temperatuur (suurem temp -> suurem alumine pall)
+	  // tuul - tuule kiirus (suurem tuul -> suurem keskmine pall)
+	  // puhang - puhangukiirus (suurem puhang -> suurem ülemine pall)
+	  // kuupaev - kuupäevatekst, mis joonistatakse alumise palli keskele
+	  function lumememm(x, y, temp, tuul, puhang, kuupaev){
+	    let r1 = temp * 8;      // alumise palli raadius
+	    let r2 = tuul * 4;      // keskmise palli raadius
+	    let r3 = puhang * 1;    // ülemise palli raadius
+
+	    // Alumine pall (temperatuur)
+	    g.beginPath();
+	    g.arc(x, y, r1, 0, 2 * Math.PI);
+	    g.stroke();
+
+	    // Kuupäev alumise palli keskele
+	    g.textAlign = "center";
+	    g.textBaseline = "middle";
+	    g.font = "14px Arial";
+	    g.fillStyle = "black";
+	    g.fillText(kuupaev, x, y);
+
+	    // Keskmine pall (tuule kiirus)
+	    let y2 = y - r1 - r2;
+	    g.beginPath();
+	    g.arc(x, y2, r2, 0, 2 * Math.PI);
+	    g.stroke();
+
+	    // Ülemine pall (puhangu kiirus)
+	    let y3 = y2 - r2 - r3;
+	    g.beginPath();
+	    g.arc(x, y3, r3, 0, 2 * Math.PI);
+	    g.stroke();
+	  }
+
+	  function joonista(){
+	    g = tahvel.getContext("2d");
+
+	    // Joonistame iga päeva ilmaandmete põhjal lumememme
+	    for(let i = 0; i < ilmaandmed.length; i++){
+	      let d = ilmaandmed[i];
+	      let x = 90 + i * 150;
+	      let y = 260;
+	      lumememm(x, y, d.temp, d.tuul, d.puhang, d.kuupaev);
+	    }
+	  }
+	</script>
+  </head>
+  <body onload="joonista()">
+    <h1>Ilmaennustuse lumememmed</h1>
+	<p>Alumine pall = temperatuur | Keskmine pall = tuule kiirus | Ülemine pall = puhangu kiirus</p>
+	<canvas id="tahvel" width="650" height="340">
+	</canvas>
+  </body>
+</html>
+
+==================================================
+
+KASUTAJA:
+Salvesta praegu vestlustaknas kirjutatud ja näha olnud teksti faili vestlus.txt

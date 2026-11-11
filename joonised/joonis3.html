@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Lumememm</title>
+	<script>
+	  function joonista(){
+	    let g=tahvel.getContext("2d");
+		
+		// Alumine ring
+		g.beginPath();
+		g.arc(200, 220, 50, 0, 2 * Math.PI);
+		g.stroke();
+
+		// Keskmine ring
+		g.beginPath();
+		g.arc(200, 145, 35, 0, 2 * Math.PI);
+		g.stroke();
+
+		// Ülemine ring (pea)
+		g.beginPath();
+		g.arc(200, 85, 25, 0, 2 * Math.PI);
+		g.stroke();
+	  }
+	</script>
+  </head>
+  <body onload="joonista()">
+    <h1>Lumememm</h1>
+	<canvas id="tahvel" width="400" height="300">
+	</canvas>
+  </body>
+</html>
