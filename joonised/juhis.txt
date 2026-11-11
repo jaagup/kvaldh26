@@ -1,0 +1,3 @@
+Pange oma leht githubi
+Koostage (ilma)andmetest veebitabel
+Teisendage joonisefaili nõnda, et joonised koostatakse veebitabeli andmete põhjal
